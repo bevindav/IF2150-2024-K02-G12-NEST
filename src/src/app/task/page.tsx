@@ -1,7 +1,12 @@
-import React from "react";
+import React from 'react'
+import TaskCard from '../components/TaskCard'
 
 const page = () => {
-  return <div>task</div>;
-};
+  return (
+    <div>
+      <TaskCard/>
+    </div>
+  )
+}
 
-export default page;
+export default page

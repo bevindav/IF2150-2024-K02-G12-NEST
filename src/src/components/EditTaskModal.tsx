@@ -8,7 +8,7 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
   const [deadline, setDeadline] = useState(
     new Date(task.deadline).toISOString().slice(0, 16) // Convert to datetime-local format
   );
-
+  const [error, setError] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -18,7 +18,10 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
       description,
       deadline,
     };
-
+    if (new Date(deadline) <= new Date()) {
+      setError("Deadline must be a future date and time.");
+      return;
+    }
     const response = await fetch("/api/tasks", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -68,6 +71,7 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
               className="border p-3 w-full rounded-md"
               required
             />
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
           <div className="flex justify-end space-x-2">
             <button

@@ -8,6 +8,7 @@ import Image from "next/image";
 import CommentIcon from "../../public/comment-icon.svg";
 import EditIcon from "../../public/edit-icon.svg";
 import DeleteIcon from "../../public/delete-icon.svg";
+import { DateTime } from "luxon";
 
 export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }: any) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -87,12 +88,15 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }: any) {
       <p className="pt-3">
         <span
           className={
-            new Date(task.deadline) < new Date()
+            new Date(new Date(task.deadline).getTime() - 7 * 60 * 60 * 1000) <
+              new Date() && !isChecked
               ? "text-[#FF7979] bg-[#FFF2F2] px-3 py-1 rounded-full"
               : "text-[#888DA7] bg-[#F4F4F7] px-3 py-1 rounded-full "
           }
         >
-          {new Date(task.deadline).toLocaleString()}
+          {DateTime.fromISO(task.deadline, { zone: "utc" }).toFormat(
+            "yyyy-MM-dd HH:mm"
+          )}
         </span>
       </p>
 

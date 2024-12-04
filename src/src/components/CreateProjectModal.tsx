@@ -13,6 +13,7 @@ export default function CreateProjectModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [error, setError] = useState(""); // State for error message
 
   const handleCreate = async () => {
     console.log("Creating project with data:", {
@@ -20,6 +21,12 @@ export default function CreateProjectModal({
       description,
       deadline,
     }); // Debug: log form data
+
+    // Validate the deadline
+    if (new Date(deadline) <= new Date()) {
+      setError("Deadline must be a future date and time.");
+      return;
+    }
 
     try {
       const response = await fetch("/api/projects", {
@@ -39,11 +46,11 @@ export default function CreateProjectModal({
         onClose(); // Close the modal
       } else {
         console.error("Failed to create project");
-        alert("Failed to create project.");
+        setError("Failed to create project. Please try again.");
       }
     } catch (error) {
       console.error("Error creating project:", error);
-      alert("An error occurred while creating the project.");
+      setError("An error occurred while creating the project.");
     }
   };
 
@@ -82,6 +89,8 @@ export default function CreateProjectModal({
               className="border p-3 w-full rounded-md"
               required
             />
+            {/* Error message */}
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
           <div className="flex justify-end space-x-2">
             <button

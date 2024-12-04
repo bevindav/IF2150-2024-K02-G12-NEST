@@ -7,6 +7,7 @@ import ProgressIcon from "../../public/progress-icon.svg";
 import EditIcon from "../../public/edit-icon.svg";
 import DeleteIIcon from "../../public/delete-icon.svg";
 import Link from "next/link";
+import { DateTime } from "luxon";
 
 export default function ProjectCard({
   project,
@@ -98,12 +99,16 @@ export default function ProjectCard({
       <p className="mt-4">
         <span
           className={
-            new Date(project.deadline) < new Date()
+            new Date(
+              new Date(project.deadline).getTime() - 7 * 60 * 60 * 1000
+            ) < new Date()
               ? "text-[#FF7979] bg-[#FFF2F2] px-3 py-1 rounded-full"
               : "text-[#888DA7] bg-[#F4F4F7] px-3 py-1 rounded-full "
           }
         >
-          {new Date(project.deadline).toLocaleString()}
+          {DateTime.fromISO(project.deadline, { zone: "utc" }).toFormat(
+            "yyyy-MM-dd HH:mm"
+          )}
         </span>
       </p>
       <div className="flex justify-between items-center">

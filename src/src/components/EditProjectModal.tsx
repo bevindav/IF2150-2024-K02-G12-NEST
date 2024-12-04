@@ -11,6 +11,7 @@ export default function EditProjectModal({
   const [deadline, setDeadline] = useState(
     new Date(project.deadline).toISOString().slice(0, 16) // Convert to datetime-local format
   );
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +22,10 @@ export default function EditProjectModal({
       description,
       deadline,
     };
-
+    if (new Date(deadline) <= new Date()) {
+      setError("Deadline must be a future date and time.");
+      return;
+    }
     console.log("Payload being sent:", payload); // Debug: log payload
 
     const response = await fetch("/api/projects", {
@@ -74,6 +78,7 @@ export default function EditProjectModal({
               className="border p-3 w-full rounded-md"
               required
             />
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
           <div className="flex justify-end space-x-2">
             <button

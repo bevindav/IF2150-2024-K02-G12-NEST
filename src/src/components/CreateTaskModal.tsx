@@ -16,8 +16,13 @@ export default function CreateTaskModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
+  const [error, setError] = useState("");
 
   const handleCreate = async () => {
+    if (new Date(deadline) <= new Date()) {
+      setError("Deadline must be a future date and time.");
+      return;
+    }
     try {
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -77,6 +82,7 @@ export default function CreateTaskModal({
               className="border p-3 w-full rounded-md"
               required
             />
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           </div>
           <div className="flex justify-end space-x-4">
             <button

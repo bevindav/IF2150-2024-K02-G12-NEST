@@ -40,12 +40,20 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    const rawDeadline = new Date(deadline);
+    console.log("Parsed deadline before adjustment:", rawDeadline);
+
+    // Manually add 7 hours to the deadline
+    const adjustedDeadline = new Date(
+      rawDeadline.getTime() + 7 * 60 * 60 * 1000
+    );
+    console.log("Adjusted deadline (local time):", adjustedDeadline);
 
     const newTask = await prisma.task.create({
       data: {
         title,
         description,
-        deadline: new Date(deadline),
+        deadline: adjustedDeadline,
         projectId,
       },
     });

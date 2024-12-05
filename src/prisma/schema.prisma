@@ -50,4 +50,5 @@ model Notification {
   taskId      Int?      // Optional if the notification is project-specific
   task        Task?     @relation(fields: [taskId], references: [id])
   createdAt   DateTime  @default(now())
+  read        Boolean   @default(false) // Track read status
 }

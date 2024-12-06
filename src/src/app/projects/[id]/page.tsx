@@ -113,7 +113,7 @@ export default function ProjectTasks() {
       </div>
 
       {/* Add Task Button */}
-      <div className="border-2 border-dashed border-black/20 rounded-2xl w-full mt-10 p-7 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      <div className="border-2 border-dashed border-black/20 rounded-2xl w-full mt-10 p-7 grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
         <button
           className="py-2 px-4 rounded-xl w-full border-2 border-[#d2d2d2] font-semibold flex gap-3 items-center justify-center h-auto hover:bg-[#FFA048] hover:border-[#FFA048] hover:text-white duration-300"
           onClick={() => setIsModalOpen(true)}

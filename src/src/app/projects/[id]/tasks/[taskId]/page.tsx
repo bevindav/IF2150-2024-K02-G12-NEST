@@ -132,7 +132,7 @@ export default function TaskDetailsPage() {
       </div>
 
       {/* Comments Section */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 mt-4">
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 mt-4 mb-10">
         {comments.length > 0 ? (
           comments.map((comment) => (
             <div

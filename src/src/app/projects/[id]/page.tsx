@@ -133,6 +133,7 @@ export default function ProjectTasks() {
       {isModalOpen && (
         <CreateTaskModal
           projectId={project.id}
+          projectDeadline={project.deadline}
           onClose={() => setIsModalOpen(false)}
           onTaskCreated={handleTaskCreated}
         />

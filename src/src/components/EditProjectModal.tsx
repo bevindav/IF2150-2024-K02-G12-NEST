@@ -39,6 +39,7 @@ export default function EditProjectModal({
       console.log("Updated project received:", updatedProject); // Debug: log response
       onProjectUpdated(updatedProject); // Notify parent component
       onClose(); // Close the modal
+      window.location.reload();
     } else {
       console.error("Failed to update project:", await response.json()); // Debug server response
       alert("Failed to update project.");

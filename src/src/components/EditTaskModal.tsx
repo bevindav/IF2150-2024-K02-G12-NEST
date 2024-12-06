@@ -2,15 +2,65 @@
 
 import { useState } from "react";
 
-export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
+interface EditTaskModalProps {
+  task: any;
+  projectDeadline: string; // Pass the project's deadline as a prop
+  onClose: () => void;
+  onTaskUpdated: (task: any) => void;
+}
+
+export default function EditTaskModal({
+  task,
+  projectDeadline,
+  onClose,
+  onTaskUpdated,
+}: EditTaskModalProps) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
   const [deadline, setDeadline] = useState(
     new Date(task.deadline).toISOString().slice(0, 16) // Convert to datetime-local format
   );
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({
+    title: "",
+    description: "",
+    deadline: "",
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      title: "",
+      description: "",
+      deadline: "",
+    };
+
+    if (!title.trim()) {
+      newErrors.title = "Task title is required.";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Task description is required.";
+    }
+
+    const taskDeadline = new Date(deadline);
+    const projectDeadlineDate = new Date(
+      new Date(projectDeadline).getTime() - 7 * 60 * 60 * 1000
+    );
+
+    if (!deadline) {
+      newErrors.deadline = "Deadline is required.";
+    } else if (taskDeadline <= new Date()) {
+      newErrors.deadline = "Deadline must be a future date and time.";
+    } else if (taskDeadline > projectDeadlineDate) {
+      newErrors.deadline = `Deadline cannot surpass the project's deadline (${projectDeadlineDate}).`;
+    }
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => !error);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
     const payload = {
       id: task.id,
@@ -18,23 +68,32 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
       description,
       deadline,
     };
-    if (new Date(deadline) <= new Date()) {
-      setError("Deadline must be a future date and time.");
-      return;
-    }
-    const response = await fetch("/api/tasks", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
 
-    if (response.ok) {
-      const updatedTask = await response.json();
-      console.log("onTaskUpdated:", onTaskUpdated);
-      onTaskUpdated(updatedTask);
-      onClose();
-    } else {
-      alert("Failed to update task.");
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const updatedTask = await response.json();
+        onTaskUpdated(updatedTask); // Notify parent component
+        onClose(); // Close the modal
+        // Refresh page after successful task edit
+        window.location.reload();
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          deadline: "Failed to update task. Please try again.",
+        }));
+      }
+    } catch (error) {
+      console.error("Error updating task:", error);
+      setErrors((prev) => ({
+        ...prev,
+        deadline: "An error occurred while updating the task.",
+      }));
     }
   };
 
@@ -52,6 +111,9 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
               className="border p-3 w-full rounded-md"
               required
             />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-2">{errors.title}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Task's Description</label>
@@ -61,6 +123,9 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
               className="border p-3 w-full rounded-md"
               required
             ></textarea>
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-2">{errors.description}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Deadline</label>
@@ -71,7 +136,9 @@ export default function EditTaskModal({ task, onClose, onTaskUpdated }: any) {
               className="border p-3 w-full rounded-md"
               required
             />
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {errors.deadline && (
+              <p className="text-red-500 text-sm mt-2">{errors.deadline}</p>
+            )}
           </div>
           <div className="flex justify-end space-x-2">
             <button

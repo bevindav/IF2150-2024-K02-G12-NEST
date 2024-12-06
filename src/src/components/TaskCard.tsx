@@ -177,6 +177,7 @@ export default function TaskCard({ task, onTaskUpdated, onTaskDeleted }: any) {
       {isEditing && (
         <EditTaskModal
           task={task}
+          projectDeadline={task.project.deadline}
           onClose={() => setIsEditing(false)}
           onTaskUpdated={onTaskUpdated}
         />

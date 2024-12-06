@@ -13,20 +13,32 @@ export default function CreateProjectModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [error, setError] = useState(""); // State for error message
+  const [errors, setErrors] = useState<{
+    title: string;
+    description: string;
+    deadline: string;
+    form?: string; // Added form as an optional property
+  }>({
+    title: "",
+    description: "",
+    deadline: "",
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      title: title.trim() ? "" : "Title is required.",
+      description: description.trim() ? "" : "Description is required.",
+      deadline:
+        new Date(deadline) > new Date()
+          ? ""
+          : "Deadline must be a future date and time.",
+    };
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => error === "");
+  };
 
   const handleCreate = async () => {
-    console.log("Creating project with data:", {
-      title,
-      description,
-      deadline,
-    }); // Debug: log form data
-
-    // Validate the deadline
-    if (new Date(deadline) <= new Date()) {
-      setError("Deadline must be a future date and time.");
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
       const response = await fetch("/api/projects", {
@@ -46,11 +58,17 @@ export default function CreateProjectModal({
         onClose(); // Close the modal
       } else {
         console.error("Failed to create project");
-        setError("Failed to create project. Please try again.");
+        setErrors((prev) => ({
+          ...prev,
+          form: "Failed to create project. Please try again.",
+        }));
       }
     } catch (error) {
       console.error("Error creating project:", error);
-      setError("An error occurred while creating the project.");
+      setErrors((prev) => ({
+        ...prev,
+        form: "An error occurred while creating the project.",
+      }));
     }
   };
 
@@ -65,20 +83,28 @@ export default function CreateProjectModal({
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="border p-3 w-full rounded-md"
+              className={`border p-3 w-full rounded-md ${
+                errors.title ? "border-red-500" : ""
+              }`}
               placeholder="Enter project title"
-              required
             />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-2">{errors.title}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="border p-3 w-full rounded-md"
+              className={`border p-3 w-full rounded-md ${
+                errors.description ? "border-red-500" : ""
+              }`}
               placeholder="Enter project description"
-              required
             ></textarea>
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-2">{errors.description}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Deadline</label>
@@ -86,11 +112,13 @@ export default function CreateProjectModal({
               type="datetime-local"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="border p-3 w-full rounded-md"
-              required
+              className={`border p-3 w-full rounded-md ${
+                errors.deadline ? "border-red-500" : ""
+              }`}
             />
-            {/* Error message */}
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {errors.deadline && (
+              <p className="text-red-500 text-sm mt-2">{errors.deadline}</p>
+            )}
           </div>
           <div className="flex justify-end space-x-2">
             <button
@@ -108,6 +136,11 @@ export default function CreateProjectModal({
               Create
             </button>
           </div>
+          {errors.form && (
+            <p className="text-red-500 text-sm mt-2 text-center">
+              {errors.form}
+            </p>
+          )}
         </form>
       </div>
     </div>

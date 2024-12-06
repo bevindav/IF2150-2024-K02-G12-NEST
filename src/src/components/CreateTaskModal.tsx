@@ -1,28 +1,64 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CreateTaskModalProps {
   projectId: number;
+  projectDeadline: string; // Pass the project's deadline as a prop
   onClose: () => void;
   onTaskCreated: (task: any) => void;
 }
 
 export default function CreateTaskModal({
   projectId,
+  projectDeadline,
   onClose,
   onTaskCreated,
 }: CreateTaskModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({
+    title: "",
+    description: "",
+    deadline: "",
+  });
+
+  const validateForm = () => {
+    const newErrors = {
+      title: "",
+      description: "",
+      deadline: "",
+    };
+
+    if (!title.trim()) {
+      newErrors.title = "Task title is required.";
+    }
+
+    if (!description.trim()) {
+      newErrors.description = "Task description is required.";
+    }
+
+    const taskDeadline = new Date(deadline);
+    const projectDeadlineDate = new Date(
+      new Date(projectDeadline).getTime() - 7 * 60 * 60 * 1000
+    );
+
+    if (!deadline) {
+      newErrors.deadline = "Deadline is required.";
+    } else if (taskDeadline <= new Date()) {
+      newErrors.deadline = "Deadline must be a future date and time.";
+    } else if (taskDeadline > projectDeadlineDate) {
+      newErrors.deadline = `Deadline cannot surpass the project's deadline (${projectDeadlineDate}).`;
+    }
+
+    setErrors(newErrors);
+    return Object.values(newErrors).every((error) => !error);
+  };
 
   const handleCreate = async () => {
-    if (new Date(deadline) <= new Date()) {
-      setError("Deadline must be a future date and time.");
-      return;
-    }
+    if (!validateForm()) return;
+
     try {
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -38,12 +74,20 @@ export default function CreateTaskModal({
       if (response.ok) {
         const newTask = await response.json();
         onTaskCreated(newTask);
+        onClose();
+        // Refresh page after successful task creation
       } else {
-        alert("Failed to create task");
+        setErrors((prev) => ({
+          ...prev,
+          deadline: "Failed to create task. Please try again.",
+        }));
       }
     } catch (error) {
       console.error("Error creating task:", error);
-      alert("An error occurred while creating the task.");
+      setErrors((prev) => ({
+        ...prev,
+        deadline: "An error occurred while creating the task.",
+      }));
     }
   };
 
@@ -62,6 +106,9 @@ export default function CreateTaskModal({
               placeholder="Enter task title"
               required
             />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-2">{errors.title}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Task's Description</label>
@@ -72,6 +119,9 @@ export default function CreateTaskModal({
               placeholder="Enter task description"
               required
             ></textarea>
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-2">{errors.description}</p>
+            )}
           </div>
           <div>
             <label className="block mb-2">Deadline</label>
@@ -82,7 +132,9 @@ export default function CreateTaskModal({
               className="border p-3 w-full rounded-md"
               required
             />
-            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            {errors.deadline && (
+              <p className="text-red-500 text-sm mt-2">{errors.deadline}</p>
+            )}
           </div>
           <div className="flex justify-end space-x-4">
             <button

@@ -17,7 +17,7 @@ export async function GET(req: Request) {
   try {
     const tasks = await prisma.task.findMany({
       where: { projectId: parseInt(projectId, 10) },
-      include: { comments: true }, // Include comments
+      include: { comments: true, project: true }, // Include comments
     });
 
     return NextResponse.json(tasks, { status: 200 });

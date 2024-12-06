@@ -3,10 +3,15 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+// Get notifications
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const unread = url.searchParams.get("unread");
+
   try {
     const notifications = await prisma.notification.findMany({
-      include: { project: true, task: true },
+      where: unread === "true" ? { read: false } : {},
+      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(notifications, { status: 200 });
   } catch (error) {
@@ -18,21 +23,22 @@ export async function GET() {
   }
 }
 
+// Create a notification
 export async function POST(req: Request) {
   try {
-    const { message, type, timeLeft, projectId, taskId } = await req.json();
+    const { type, message, projectId, taskId, timeLeft } = await req.json();
 
-    if (!message || !type || !timeLeft) {
+    if (!type || !message || !timeLeft) {
       return NextResponse.json(
-        { error: "Message, type, and timeLeft are required" },
+        { error: "Missing required fields" },
         { status: 400 }
       );
     }
 
     const newNotification = await prisma.notification.create({
       data: {
-        message,
         type,
+        message,
         timeLeft,
         projectId,
         taskId,
@@ -49,26 +55,23 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+// Mark all unread notifications as read
+export async function PATCH(req: Request) {
   try {
-    const { id } = await req.json();
+    const updatedNotifications = await prisma.notification.updateMany({
+      where: { read: false },
+      data: { read: true },
+    });
 
-    if (!id) {
-      return NextResponse.json(
-        { error: "Notification ID is required" },
-        { status: 400 }
-      );
-    }
-
-    await prisma.notification.delete({ where: { id } });
+    console.log(`${updatedNotifications.count} notifications marked as read.`);
     return NextResponse.json(
-      { message: "Notification dismissed successfully" },
+      { message: "All unread notifications marked as read" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error dismissing notification:", error);
+    console.error("Error marking notifications as read:", error);
     return NextResponse.json(
-      { error: "Failed to dismiss notification" },
+      { error: "Failed to mark notifications as read" },
       { status: 500 }
     );
   }

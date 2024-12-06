@@ -3,11 +3,23 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const projectId = searchParams.get("projectId");
+
+  if (!projectId) {
+    return NextResponse.json(
+      { error: "Project ID is required" },
+      { status: 400 }
+    );
+  }
+
   try {
     const tasks = await prisma.task.findMany({
-      include: { project: true, notifications: true },
+      where: { projectId: parseInt(projectId, 10) },
+      include: { comments: true, project: true }, // Include comments
     });
+
     return NextResponse.json(tasks, { status: 200 });
   } catch (error) {
     console.error("Error fetching tasks:", error);
@@ -28,12 +40,20 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    const rawDeadline = new Date(deadline);
+    console.log("Parsed deadline before adjustment:", rawDeadline);
+
+    // Manually add 7 hours to the deadline
+    const adjustedDeadline = new Date(
+      rawDeadline.getTime() + 7 * 60 * 60 * 1000
+    );
+    console.log("Adjusted deadline (local time):", adjustedDeadline);
 
     const newTask = await prisma.task.create({
       data: {
         title,
         description,
-        deadline: new Date(deadline),
+        deadline: adjustedDeadline,
         projectId,
       },
     });
@@ -60,8 +80,12 @@ export async function PUT(req: Request) {
     }
 
     const updatedTask = await prisma.task.update({
-      where: { id },
-      data: { title, description, deadline: new Date(deadline) },
+      where: { id: parseInt(id, 10) },
+      data: {
+        title,
+        description,
+        deadline: new Date(deadline),
+      },
     });
 
     return NextResponse.json(updatedTask, { status: 200 });
@@ -74,6 +98,7 @@ export async function PUT(req: Request) {
   }
 }
 
+// DELETE: Delete a task
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json();
@@ -85,7 +110,10 @@ export async function DELETE(req: Request) {
       );
     }
 
-    await prisma.task.delete({ where: { id } });
+    await prisma.task.delete({
+      where: { id: parseInt(id, 10) },
+    });
+
     return NextResponse.json(
       { message: "Task deleted successfully" },
       { status: 200 }

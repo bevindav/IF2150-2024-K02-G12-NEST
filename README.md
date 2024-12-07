@@ -1,6 +1,9 @@
 # IF2150-2024-K02-G12-NEST
 
-**Nest** is an application designed as a tool for managing projects and tasks, catering to users who want to plan and organize their daily activities in a more structured and efficient manner. This software includes the management of various projects and their associated tasks, equipped with features designed to help users better manage their time and workload. The software focuses on three main aspects: project management, task management, and notifications and monitoring.
+**Nest** is an application designed as a tool for managing projects and tasks, catering to users who want to plan and organize their daily activities in a more structured and efficient manner. This software includes the management of various projects and their associated tasks, equipped with features designed to help users better manage their time and workload. The software focuses on three main aspects:
+ - **Project management**
+ - **Task management and notifications**
+ - **Monitoring**
 
 ## Getting Started
 

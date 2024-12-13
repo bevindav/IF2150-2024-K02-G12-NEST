@@ -69,29 +69,29 @@ List of all the modules that is being implemented and the main feature interface
 ### Project Management
 Create and manage projects with deadlines and track progress efficiently.
 <p align="center">
-  <img src="src\doc\ProyekDisplay3.png" alt="Add New Project" width="450"/>
-  <img src="src\doc\FormProyek4.png" alt="Project Management" width="450"/>
+  <img src="doc\ProyekDisplay3.png" alt="Add New Project" width="450"/>
+  <img src="doc\FormProyek4.png" alt="Project Management" width="450"/>
 </p>
 
 ### Task Management
 Create and manage tasks within projects.
 <p align="center">
-  <img src="src\doc\TugasDisplay2.png" alt="Add New Task" width="450"/>
-  <img src="src\doc\TugasController.png" alt="Task Dashboard" width="450"/>
+  <img src="doc\TugasDisplay2.png" alt="Add New Task" width="450"/>
+  <img src="doc\TugasController.png" alt="Task Dashboard" width="450"/>
 </p>
 
 ### Notification
 The notification system ensures users stay updated with their project and task deadlines. It provides real-time alerts and reminders to help users track their progress effectively.
 <p align="center">
-  <img src="src\doc\NotifikasiDisplay.png" alt="Notification Popup" width="450"/>
-  <img src="src\doc\NotifikasiDisplay1.png" alt="Notification Menu" width="450"/>
+  <img src="doc\NotifikasiDisplay.png" alt="Notification Popup" width="450"/>
+  <img src="doc\NotifikasiDisplay1.png" alt="Notification Menu" width="450"/>
 </p>
 
 ### Comments
 The comment system enables addtional comment on tasks. Users can add, view, and manage comments for better communication and clarity.
 <p align="center">  
-  <img src="src\doc\FormKomentar.png" alt="Comment Management" width="450"/>
-  <img src="src\doc\KomentarDisplay1.png" alt="Comment Display" width="450"/>
+  <img src="doc\FormKomentar.png" alt="Comment Management" width="450"/>
+  <img src="doc\KomentarDisplay1.png" alt="Comment Display" width="450"/>
 </p>
 
 

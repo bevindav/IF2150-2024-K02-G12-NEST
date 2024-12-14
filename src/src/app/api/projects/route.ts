@@ -80,11 +80,25 @@ export async function PUT(req: Request) {
         { status: 400 }
       );
     }
+    const rawDeadline = new Date(deadline);
+    console.log("Parsed deadline before adjustment:", rawDeadline);
 
+    // Manually add 7 hours to the deadline
+    const adjustedDeadline = new Date(
+      rawDeadline.getTime() + 7 * 60 * 60 * 1000
+    );
+    console.log("Adjusted deadline edit (local time):", adjustedDeadline);
+
+    if (new Date(deadline) <= new Date()) {
+      return NextResponse.json(
+        { error: "Deadline must be in the future" },
+        { status: 400 }
+      );
+    }
     // Update the project
     const updatedProject = await prisma.project.update({
       where: { id },
-      data: { title, description, deadline: new Date(deadline) },
+      data: { title, description, deadline: adjustedDeadline},
     });
 
     return NextResponse.json(updatedProject, { status: 200 });

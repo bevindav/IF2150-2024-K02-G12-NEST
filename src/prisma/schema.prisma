@@ -9,46 +9,45 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
-
 model Project {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  deadline    DateTime
-  tasks       Task[]
-  notifications Notification[]
-  createdAt   DateTime @default(now())
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  deadline      DateTime
+  tasks         Task[]          // No need for onDelete here
+  notifications Notification[]  // No need for onDelete here
+  createdAt     DateTime        @default(now())
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String
-  deadline    DateTime
-  completed   Boolean  @default(false)
-  projectId   Int
-  project     Project  @relation(fields: [projectId], references: [id])
-  comments    Comment[]
-  notifications Notification[]
-  createdAt   DateTime @default(now())
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  deadline      DateTime
+  completed     Boolean         @default(false)
+  projectId     Int
+  project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade) // Cascade defined here
+  comments      Comment[]       // No need for onDelete here
+  notifications Notification[]  // No need for onDelete here
+  createdAt     DateTime        @default(now())
 }
 
 model Comment {
-  id      Int      @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   text    String
   taskId  Int
-  task    Task     @relation(fields: [taskId], references: [id])
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade) // Cascade defined here
 }
 
 model Notification {
-  id          Int       @id @default(autoincrement())
-  message     String    // Notification message
-  type        String    // "project" or "task"
-  timeLeft    String    // e.g., "1 day left", "5 hours left"
-  projectId   Int?      // Optional if the notification is task-specific
-  project     Project?  @relation(fields: [projectId], references: [id])
-  taskId      Int?      // Optional if the notification is project-specific
-  task        Task?     @relation(fields: [taskId], references: [id])
-  createdAt   DateTime  @default(now())
-  read        Boolean   @default(false) // Track read status
+  id          Int      @id @default(autoincrement())
+  message     String   // Notification message
+  type        String   // "project" or "task"
+  timeLeft    String   // e.g., "1 day left", "5 hours left"
+  projectId   Int?     // Optional if the notification is task-specific
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: Cascade) // Cascade defined here
+  taskId      Int?     // Optional if the notification is project-specific
+  task        Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade) // Cascade defined here
+  createdAt   DateTime @default(now())
+  read        Boolean  @default(false) // Track read status
 }
